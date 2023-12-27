@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-DATA_BASE_SETTINGS_FILE = os.path.join(BASE_DIR, "../../data_base_conf.json")
+DATA_BASE_SETTINGS_FILE = os.path.join(BASE_DIR, "../data_base_data.json")
 with open(DATA_BASE_SETTINGS_FILE) as data_file:
     data_base_settings = json.load(data_file)
 
