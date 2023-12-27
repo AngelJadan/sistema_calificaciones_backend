@@ -15,8 +15,31 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include
+from rest_framework.schemas import get_schema_view
+from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path(
+        "openapi/",
+        get_schema_view(
+            title="School Service",
+            description="API developers hpoing to use our service",
+            version="1.0.0",
+        ),
+        name="openapi-schema",
+    ),
+    path(
+        "documentation/",
+        TemplateView.as_view(
+            template_name="documentation_api.html",
+            extra_context={"schema_url": "openapi-schema"},
+        ),
+        name="documentation",
+    ),
+    path("persona/", include("persona.urls")),
+    path("calificacion/", include("calificacion.urls")),
+    path("curso/", include("curso.urls")),
 ]
