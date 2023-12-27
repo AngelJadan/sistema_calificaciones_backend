@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 # Create your models here.
 TIPO_IDENTIFICACION = (
@@ -8,8 +8,7 @@ TIPO_IDENTIFICACION = (
 )
 
 
-class Persona(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="ID")
+class Persona(User):
     identificacion = models.CharField(max_length=20, verbose_name="Identificacion")
     tipo_identificacion = models.CharField(
         max_length=2, choices=TIPO_IDENTIFICACION, verbose_name="Tipo identificacion"
@@ -30,9 +29,9 @@ TIPO_FUNCIONARIO = (
 )
 
 
-class Rector(Persona):
+class Funcionario(Persona):
     fecha_inicio = models.DateField(verbose_name="Fecha inicio")
-    fecha_final = models.DateField(verbose_name="Fecha final")
+    fecha_final = models.DateField(null=True, blank=True, verbose_name="Fecha final")
     tipo = models.CharField(max_length=2, choices=TIPO_FUNCIONARIO, verbose_name="Tipo")
 
     def __str__(self):
