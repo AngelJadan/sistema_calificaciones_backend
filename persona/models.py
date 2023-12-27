@@ -31,7 +31,7 @@ TIPO_FUNCIONARIO = (
 
 class Funcionario(Persona):
     fecha_inicio = models.DateField(verbose_name="Fecha inicio")
-    fecha_final = models.DateField(verbose_name="Fecha final")
+    fecha_final = models.DateField(null=True, blank=True, verbose_name="Fecha final")
     tipo = models.CharField(max_length=2, choices=TIPO_FUNCIONARIO, verbose_name="Tipo")
 
     def __str__(self):

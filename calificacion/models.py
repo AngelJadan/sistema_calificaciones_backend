@@ -50,7 +50,7 @@ class CabeceraTrimestre(models.Model):
     aporte_cualitativo = models.CharField(
         max_length=1, choices=CALIFICACION, verbose_name="Aporte cualitativo"
     )
-    proyecto_integrador = models.FloatField(vebose_name="Proyecto integrador")
+    proyecto_integrador = models.FloatField(verbose_name="Proyecto integrador")
     cualitativo_proyecto_integrador = models.CharField(
         max_length=1,
         choices=CALIFICACION,
