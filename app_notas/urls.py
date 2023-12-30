@@ -18,10 +18,11 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from rest_framework.schemas import get_schema_view
 from django.views.generic import TemplateView
+from persona import views as views_persona
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "openapi/",
         get_schema_view(
@@ -39,6 +40,7 @@ urlpatterns = [
         ),
         name="documentation",
     ),
+    path("obtener_token/", views_persona.obtener_token, name="obtener_token"),
     path("persona/", include("persona.urls")),
     path("calificacion/", include("calificacion.urls")),
     path("curso/", include("curso.urls")),
