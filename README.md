@@ -1,7 +1,7 @@
 Aplicacion de backend para sistema de calificaciones
 
 
-crear un fichero de tipo json de nombre 'data_base_data'
+crear un fichero de tipo json de nombre 'data_base_data' fuera del proyecto
 con el formato:
 {
     "HOST":"",
