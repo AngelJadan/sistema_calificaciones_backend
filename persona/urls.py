@@ -6,5 +6,7 @@ from persona import views
 
 urlpatterns = [
     path("users/", UserListView.as_view(), name="user-list"),
-    path("obtener_token/", views.obtener_token, name="obtener_token"),
+    path(
+        "funcionario-api/", views.FuncionarioUserView.as_view(), name="funcionario-api/"
+    ),
 ]
