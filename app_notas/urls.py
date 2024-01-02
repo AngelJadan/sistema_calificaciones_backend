@@ -41,6 +41,7 @@ urlpatterns = [
         name="documentation",
     ),
     path("obtener_token/", views_persona.obtener_token, name="obtener_token"),
+    path("log_out/", views_persona.Logout.as_view()),
     path("persona/", include("persona.urls")),
     path("calificacion/", include("calificacion.urls")),
     path("curso/", include("curso.urls")),

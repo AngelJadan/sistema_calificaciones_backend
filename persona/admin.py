@@ -15,7 +15,7 @@ class PersonaAdmin(admin.ModelAdmin):
 
 
 class FuncionarioAdmin(admin.ModelAdmin):
-    list_display = ("fecha_inicio", "fecha_final", "tipo")
+    list_display = ("fecha_ingreso", "fecha_salida", "tipo")
 
 
 class EstudianteAdmin(admin.ModelAdmin):

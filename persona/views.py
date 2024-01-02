@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 
@@ -20,6 +20,10 @@ from .serializer import (
     UserSerializer,
 )
 
+from django.contrib.auth.hashers import (
+    make_password,
+)
+
 
 # Create your views here.
 @api_view(["POST"])
@@ -28,7 +32,7 @@ def obtener_token(request):
     """
     Metodo para obtener el token e iniciar session.
 
-    @username: Nombre del usuario.
+    @email: Correo
 
     @password: Contraseña del usuario.
 
@@ -37,11 +41,12 @@ def obtener_token(request):
     @response: 400: Respuesta de error.
 
     """
-    username = request.data.get("username")
+    email = request.data.get("email")
     password = request.data.get("password")
 
-    if username and password:
-        user = authenticate(username=username, password=password)
+    if email and password:
+        user = User.objects.get(email=email)
+        user = authenticate(username=user.username, password=password)
 
         if user:
             # Si el usuario es válido, se genera un nuevo token o se obtiene el existente
@@ -51,6 +56,17 @@ def obtener_token(request):
             return Response({"error": "Credenciales inválidas"}, status=400)
     else:
         return Response({"error": "Se requieren username y password"}, status=400)
+
+
+class Logout(APIView):
+    """Clase api, para elimina el token y cerrar session."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        # simply delete the token to force a login
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 class UserListView(APIView):
@@ -64,22 +80,21 @@ class UserListView(APIView):
         return Response(serializer.data)
 
 
-class FuncionarioUserView(APIView):
+class FuncionarioUserView(generics.GenericAPIView):
+    serializer_class = FuncionarioSerializerExample
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        request_body=FuncionarioSerializer,
-        responses={201: FuncionarioSerializer()},
-        operation_description="Metodo post para registrar un funcionario",
-    )
     def post(self, request):
         if request.user.is_authenticated:
+            pw = request.data["password"]
+            pwd = make_password(pw)
+            request.data["password"] = pwd
             serializer = FuncionarioSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return Response(request.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(
                 {"error": "Acceso no autorizado"}, status=status.HTTP_401_UNAUTHORIZED

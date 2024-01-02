@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "calificacion",
     "curso",
     "persona",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
