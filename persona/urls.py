@@ -9,4 +9,7 @@ urlpatterns = [
     path(
         "funcionario-api/", views.FuncionarioUserView.as_view(), name="funcionario-api/"
     ),
+    path(
+        "change-password/", views.ChangePasswordView.as_view(), name="change_password"
+    ),
 ]

@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from persona.models import Funcionario
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,16 +10,19 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.decorators import action
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework.generics import UpdateAPIView
 
 
 from .serializer import (
+    ChangePasswordSerializer,
+    FuncionarioReadSerializer,
     FuncionarioSerializer,
     FuncionarioSerializerExample,
     UserSerializer,
 )
 
 from django.contrib.auth.hashers import (
+    check_password,
     make_password,
 )
 
@@ -82,33 +84,28 @@ class UserListView(APIView):
 
 class FuncionarioUserView(generics.GenericAPIView):
     serializer_class = FuncionarioSerializerExample
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        if request.user.is_authenticated:
-            pw = request.data["password"]
-            pwd = make_password(pw)
-            request.data["password"] = pwd
-            serializer = FuncionarioSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        pw = request.data["password"]
+        pwd = make_password(pw)
+        request.data["password"] = pwd
+        serializer = FuncionarioSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(
-                {"error": "Acceso no autorizado"}, status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, method="PUT")
     def put(self, request):
         try:
-            id = request.POST.get("id")
+            print(f"request.POST.get('id') {request.data.get('id')}")
+            id = request.data.get("id")
             funcionario = Funcionario.objects.get(id=id)
-            if request.user_is_authenticated:
-                serializer = FuncionarioSerializer(
-                    funcionario, data=request.data, context=request.context
-                )
+
+            if request.user.is_authenticated:
+                serializer = FuncionarioReadSerializer(funcionario, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -126,11 +123,15 @@ class FuncionarioUserView(generics.GenericAPIView):
             )
 
     @action(detail=False, method="GET")
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        """
+        @query_params:
+        @email: Correo de registro.
+        """
         try:
             if request.user.is_authenticated:
-                result = Funcionario.objects.get(id=request.query_params["id"])
-                serializer = FuncionarioSerializer(data=result)
+                result = Funcionario.objects.get(email=request.query_params["email"])
+                serializer = FuncionarioReadSerializer(result, many=False)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(
@@ -162,4 +163,34 @@ class FuncionarioUserView(generics.GenericAPIView):
             return Response(
                 {"error": "No existen datos con este id"},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ChangePasswordView(UpdateAPIView):
+    """
+    An endpoint for changing password.
+    """
+
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response(
+                    {"old_password": ["Credenciales incorrectos"]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            return Response(
+                {"sms": "Contraseña actualizada."}, status=status.HTTP_200_OK
             )
