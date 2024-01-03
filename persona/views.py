@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.decorators import action
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, ListAPIView
 
 
 from .serializer import (
@@ -194,3 +194,32 @@ class ChangePasswordView(UpdateAPIView):
             return Response(
                 {"sms": "Contraseña actualizada."}, status=status.HTTP_200_OK
             )
+
+
+class ListFuncionario(ListAPIView):
+    serializer_class = FuncionarioReadSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            try:
+                funcionario = Funcionario.objects.get(id=self.request.user.id)
+                if funcionario.tipo != "1":
+                    return Funcionario.objects.all()
+                else:
+                    return []
+            except Funcionario.DoesNotExist:
+                return []
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Verifica si la queryset está vacía (caso específico según tus necesidades)
+        if not queryset:
+            return Response(
+                {"mensaje": "No tienes permiso para acceder a estos datos"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

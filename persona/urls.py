@@ -12,4 +12,5 @@ urlpatterns = [
     path(
         "change-password/", views.ChangePasswordView.as_view(), name="change_password"
     ),
+    path("list_funcionario/", views.ListFuncionario.as_view(), name="list_funcionario"),
 ]
