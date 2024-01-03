@@ -1,4 +1,4 @@
-from persona.models import Funcionario
+from persona.models import Estudiante, Funcionario
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -15,6 +15,7 @@ from rest_framework.generics import UpdateAPIView, ListAPIView
 
 from .serializer import (
     ChangePasswordSerializer,
+    EstudianteSerializer,
     FuncionarioReadSerializer,
     FuncionarioSerializer,
     FuncionarioSerializerExample,
@@ -206,6 +207,118 @@ class ListFuncionario(ListAPIView):
                 funcionario = Funcionario.objects.get(id=self.request.user.id)
                 if funcionario.tipo != "1":
                     return Funcionario.objects.all()
+                else:
+                    return []
+            except Funcionario.DoesNotExist:
+                return []
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Verifica si la queryset está vacía (caso específico según tus necesidades)
+        if not queryset:
+            return Response(
+                {"mensaje": "No tienes permiso para acceder a estos datos"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class EstudianteUserView(generics.GenericAPIView):
+    serializer_class = EstudianteSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        pw = "jkjklfjklj254545"
+        pwd = make_password(pw)
+        request.data["password"] = pwd
+        serializer = EstudianteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, method="PUT")
+    def put(self, request):
+        try:
+            id = request.data.get("id")
+            estudiante = Estudiante.objects.get(id=id)
+
+            if request.user.is_authenticated:
+                serializer = EstudianteSerializer(estudiante, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(request.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(
+                    {"error": "Acceso no autorizado"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+        except Funcionario.DoesNotExist:
+            return Response(
+                {"error": "No existe un funcionario con este id."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=False, method="GET")
+    def get(self, request, *args, **kwargs):
+        """
+        @query_params:
+        @id: Id de registro.
+        """
+        try:
+            if request.user.is_authenticated:
+                result = Estudiante.objects.get(id=request.query_params["id"])
+                serializer = EstudianteSerializer(result, many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"error": "Acceso no autorizado"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+        except Estudiante.DoesNotExist:
+            return Response(
+                {"error": "No existen datos con esta id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=False, method="DELETE")
+    def delete(self, request):
+        try:
+            if request.user.is_authenticated:
+                if request.user.is_authenticated:
+                    result = Estudiante.objects.get(
+                        id=request.query_params["id"]
+                    ).delete()
+                    serializer = EstudianteSerializer(data=result)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        {"error": "Acceso no autorizado"},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+        except Estudiante.DoesNotExist:
+            return Response(
+                {"error": "No existen datos con este id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ListEstudiante(ListAPIView):
+    serializer_class = EstudianteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            try:
+                funcionario = Funcionario.objects.get(id=self.request.user.id)
+                if funcionario.tipo != "1":
+                    return Estudiante.objects.all()
                 else:
                     return []
             except Funcionario.DoesNotExist:

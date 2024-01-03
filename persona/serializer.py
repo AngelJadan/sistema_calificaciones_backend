@@ -1,5 +1,5 @@
 from django.forms import ChoiceField
-from persona.models import Funcionario
+from persona.models import Estudiante, Funcionario
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -84,4 +84,18 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class EstudianteSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Estudiante
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "identificacion",
+            "tipo_identificacion",
+            "fecha_nacimiento",
+        )
+
+    def update(self, Estudiante, validated_data):
+        return super().update(Estudiante, validated_data)
