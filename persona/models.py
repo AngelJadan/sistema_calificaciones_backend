@@ -30,16 +30,16 @@ TIPO_FUNCIONARIO = (
 
 
 class Funcionario(Persona):
-    fecha_inicio = models.DateField(verbose_name="Fecha inicio")
-    fecha_final = models.DateField(null=True, blank=True, verbose_name="Fecha final")
+    fecha_ingreso = models.DateField(verbose_name="Fecha inicio")
+    fecha_salida = models.DateField(null=True, blank=True, verbose_name="Fecha final")
     tipo = models.CharField(max_length=2, choices=TIPO_FUNCIONARIO, verbose_name="Tipo")
 
     def __str__(self):
         return f"{self.id}"
 
     class Meta:
-        verbose_name = "Rector"
-        verbose_name_plural = "Rectores"
+        verbose_name = "Funcionario"
+        verbose_name_plural = "Funcionarios"
 
 
 class Estudiante(Persona):
