@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from curso.models import Area, Curso, Materia, MateriaCursoDocente, Paralelo
+from curso.models import (
+    Area,
+    Curso,
+    Materia,
+    PeriodoLectivo,
+    Paralelo,
+)
 
 # Register your models here.
 
@@ -26,14 +32,13 @@ class MateriaAdmin(admin.ModelAdmin):
     list_display = ("id", "nombre", "area")
 
 
-class MateriaCursoDocenteAdmin(admin.ModelAdmin):
+class PeriodoLectivoAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "periodo",
         "periodo_abierto",
         "inicio_periodo",
         "cierre_periodo",
-        "curso",
     )
 
 
@@ -41,4 +46,4 @@ admin.site.register(Paralelo, ParaleloAdmin)
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(Materia, MateriaAdmin)
-admin.site.register(MateriaCursoDocente, MateriaCursoDocenteAdmin)
+admin.site.register(PeriodoLectivo, PeriodoLectivoAdmin)

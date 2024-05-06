@@ -68,17 +68,30 @@ class Materia(models.Model):
         verbose_name_plural = "Materias"
 
 
-class MateriaCursoDocente(models.Model):
+class PeriodoLectivo(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Id")
     periodo = models.IntegerField(verbose_name="Periodo")
     periodo_abierto = models.BooleanField(verbose_name="Periodo abierto")
     inicio_periodo = models.DateField(verbose_name="Inicio periodo")
     cierre_periodo = models.DateField(verbose_name="Cierre periodo")
+
+    def __str__(self):
+        return f"{self.periodo}"
+
+    class Meta:
+        verbose_name = "Materia curso docente"
+        verbose_name_plural = "Materias curso docente"
+
+
+class MateriaCursoDocente(models.Model):
+    id = models.AutoField(
+        primary_key=True,
+    )
+    periodo_lectivo = models.ForeignKey(
+        PeriodoLectivo, on_delete=models.CASCADE, verbose_name="Curso docente"
+    )
     curso = models.ForeignKey(
-        Curso,
-        related_name="curso_materia",
-        on_delete=models.CASCADE,
-        verbose_name="Curso",
+        Curso, related_name="curso", on_delete=models.CASCADE, verbose_name="Curso"
     )
     materia = models.ForeignKey(
         Materia,
@@ -88,13 +101,13 @@ class MateriaCursoDocente(models.Model):
     )
     docente = models.ForeignKey(
         Funcionario,
-        related_name="docente",
+        related_name="materia_docente",
         on_delete=models.CASCADE,
-        verbose_name="Funcionario",
+        verbose_name="Docente",
     )
 
     def __str__(self):
-        return f"{self.periodo}"
+        return f"{self.id}"
 
     class Meta:
         verbose_name = "Materia curso docente"
