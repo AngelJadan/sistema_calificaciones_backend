@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import random
 
 # Create your models here.
 TIPO_IDENTIFICACION = (
@@ -9,9 +10,13 @@ TIPO_IDENTIFICACION = (
 
 
 class Persona(User):
-    identificacion = models.CharField(max_length=20, verbose_name="Identificacion")
+    identificacion = models.CharField(
+        max_length=20, unique=True, verbose_name="Identificacion"
+    )
     tipo_identificacion = models.CharField(
-        max_length=2, choices=TIPO_IDENTIFICACION, verbose_name="Tipo identificacion"
+        max_length=2,
+        choices=TIPO_IDENTIFICACION,
+        verbose_name="Tipo identificacion",
     )
 
     def __str__(self):
@@ -20,6 +25,20 @@ class Persona(User):
     class Meta:
         verbose_name = "Persona"
         verbose_name_plural = "Personas"
+
+    def is_funcionario(self):
+        user_type = None
+        if Funcionario.objects.filter(id=self.id).count() > 0:
+            return True
+        else:
+            False
+
+    def is_estudiante(self):
+        user_type = None
+        if Estudiante.objects.filter(id=self.id).count() > 0:
+            return True
+        else:
+            False
 
 
 TIPO_FUNCIONARIO = (
@@ -40,6 +59,13 @@ class Funcionario(Persona):
     class Meta:
         verbose_name = "Funcionario"
         verbose_name_plural = "Funcionarios"
+
+    def generar_password():
+        """Genera un string aleatorio de 10 dígitos con letras y números."""
+        letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        numeros = "0123456789"
+        caracteres = letras + numeros
+        return "".join(random.choice(caracteres) for _ in range(10))
 
 
 class Estudiante(Persona):

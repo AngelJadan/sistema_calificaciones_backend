@@ -2,6 +2,9 @@ from django.forms import ChoiceField
 from persona.models import Estudiante, Funcionario
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import (
+    make_password,
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -30,12 +33,12 @@ class FuncionarioSerializerExample(serializers.Serializer):
     tipo = serializers.CharField(
         help_text="Tipo: (1, Docente), (2, Rector), (3, Secretaria)",
     )
-    password = serializers.CharField(help_text="Contraseña", max_length=128)
     identificacion = serializers.CharField(help_text="Numero de cedula", max_length=20)
     tipo_identificacion = serializers.CharField(help_text="1: Cedula, 2: Pasaporte")
 
 
 class FuncionarioSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Funcionario
         fields = (
@@ -49,8 +52,19 @@ class FuncionarioSerializer(serializers.ModelSerializer):
             "tipo",
             "identificacion",
             "tipo_identificacion",
-            "password",
         )
+
+    def create(self, validated_data):
+        password = Funcionario.generar_password()
+        pw = password
+        pwd = make_password(pw)
+        new_password = pwd
+        new_funcionario = Funcionario.objects.create(
+            **validated_data,
+            password=new_password,
+        )
+        # Pendiente implementar enviar password al correo.
+        return new_funcionario
 
     def update(self, Funcionario, validated_data):
         return super().update(Funcionario, validated_data)
@@ -86,6 +100,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 class EstudianteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudiante
+
         fields = (
             "id",
             "first_name",
@@ -96,6 +111,18 @@ class EstudianteSerializer(serializers.ModelSerializer):
             "tipo_identificacion",
             "fecha_nacimiento",
         )
+
+    def create(self, validated_data):
+        password = Funcionario.generar_password()
+        pw = password
+        pwd = make_password(pw)
+        new_password = pwd
+        new_estudiante = Estudiante.objects.create(
+            **validated_data,
+            password=new_password,
+        )
+        # Pendiente implementar enviar password al correo.
+        return new_estudiante
 
     def update(self, Estudiante, validated_data):
         return super().update(Estudiante, validated_data)
