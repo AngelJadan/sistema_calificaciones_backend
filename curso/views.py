@@ -1,4 +1,5 @@
 from calificacion.models import MateriaEstudiante
+from calificacion.serializer import MateriaEstudianteSerializer
 from curso.models import (
     Area,
     Curso,
@@ -13,7 +14,6 @@ from curso.serializer import (
     CursoSerializerRead,
     MateriaCursoDocenteReadSerializer,
     MateriaCursoDocenteSerializer,
-    MateriaEstudianteSerializer,
     MateriaReadSerializer,
     MateriaSerializer,
     ParaleloReadSerializer,
@@ -438,6 +438,30 @@ class ListMateriaCursoDocente(ListAPIView):
 
     def get_queryset(self):
         return MateriaCursoDocente.objects.all().order_by("id")
+
+
+class ListMateriaCursoDocenteToPeriodo(ListAPIView):
+    serializer_class = MateriaCursoDocenteReadSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return MateriaCursoDocente.objects.filter(
+                periodo_lectivo=self.kwargs["periodo"]
+            ).order_by("id")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Verifica si la queryset está vacía (caso específico según tus necesidades)
+        if not self.request.user.is_authenticated:
+            return Response(
+                {"mensaje": "No tienes permiso para acceder a estos datos"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MateriaEstudianteAPI(generics.GenericAPIView):

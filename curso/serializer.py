@@ -1,4 +1,5 @@
 from calificacion.models import MateriaEstudiante
+from calificacion.serializer import MateriaEstudianteReadSerializer
 from curso.models import (
     Area,
     Curso,
@@ -7,6 +8,7 @@ from curso.models import (
     Paralelo,
     PeriodoLectivo,
 )
+from persona.serializer import EstudianteSerializer
 from rest_framework import serializers
 
 
@@ -78,8 +80,9 @@ class PeriodoLectivoSerializer(serializers.ModelSerializer):
 
 
 class MateriaCursoDocenteReadSerializer(serializers.ModelSerializer):
-    class Meta:
+    materia_curso = MateriaEstudianteReadSerializer(many=True, read_only=False)
 
+    class Meta:
         model = MateriaCursoDocente
         fields = (
             "id",
@@ -87,6 +90,7 @@ class MateriaCursoDocenteReadSerializer(serializers.ModelSerializer):
             "periodo_lectivo",
             "materia",
             "docente",
+            "materia_curso",
         )
         depth = 2
 
@@ -99,9 +103,3 @@ class MateriaCursoDocenteSerializer(serializers.ModelSerializer):
 
     def update(self, MateriaCursoDocente, validated_data):
         return super().update(MateriaCursoDocente, validated_data)
-
-
-class MateriaEstudianteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MateriaEstudiante
-        fields = "__all__"
