@@ -36,7 +36,7 @@ class DetalleActividadSerializer(serializers.ModelSerializer):
 
 
 class CabeceraActividadSerializer(serializers.ModelSerializer):
-    detalle_trimestre = DetalleActividadSerializer(many=True, read_only=False)
+    detalle_actividad = DetalleActividadSerializer(many=True, read_only=False)
 
     class Meta:
         model = CabeceraActividad
@@ -44,7 +44,7 @@ class CabeceraActividadSerializer(serializers.ModelSerializer):
 
 
 class DetalleTrimesterSerializer(serializers.ModelSerializer):
-    detalle_trimestre = CabeceraActividadSerializer(many=True, read_only=False)
+    cabecera_actividad = CabeceraActividadSerializer(many=True, read_only=False)
 
     class Meta:
         model = DetalleTrimestre
@@ -75,6 +75,18 @@ class CabeceraTrimestreSerializer(serializers.ModelSerializer):
 
 
 class CabeceraTrimestreReadSerializer(serializers.ModelSerializer):
+    detalle_trimestre = DetalleTrimesterSerializer(many=True, read_only=False)
+
     class Meta:
         model = CabeceraTrimestre
         fields = "__all__"
+
+
+class MateriaEstudianteAllSerializer(serializers.ModelSerializer):
+    estudiante = EstudianteSerializer(many=False, read_only=False)
+    estudiante_trimestre = CabeceraTrimestreReadSerializer(many=True, read_only=False)
+
+    class Meta:
+        model = MateriaEstudiante
+        fields = "__all__"
+        depth = 1

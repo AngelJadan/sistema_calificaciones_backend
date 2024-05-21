@@ -1,10 +1,21 @@
-from calificacion.models import CabeceraTrimestre, DetalleTrimestre, MateriaEstudiante
+from calificacion.models import (
+    CabeceraActividad,
+    CabeceraTrimestre,
+    DetalleActividad,
+    DetalleTrimestre,
+    MateriaEstudiante,
+)
 from calificacion.serializer import (
     CabeceraTrimestreReadSerializer,
     CabeceraTrimestreSerializer,
+    MateriaEstudianteAllSerializer,
     MateriaEstudianteSerializer,
 )
-from curso.serializer import MateriaEstudianteReadSerializer
+from curso.models import MateriaCursoDocente
+from curso.serializer import (
+    MateriaEstudianteReadSerializer,
+)
+from persona.models import Estudiante
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
@@ -203,3 +214,17 @@ class ListEstudianteCabeceraTrimestre(ListAPIView):
         return CabeceraTrimestre.objects.filter(
             materia_estudiante__estudiante=self.kwargs["estudante"]
         ).order_by("id")
+
+
+@api_view(["GET"])
+def api_view(request, curso_materia):
+    try:
+        materia_in_curso = MateriaEstudiante.objects.filter(materia_curso=curso_materia)
+        serializers = MateriaEstudianteAllSerializer(materia_in_curso, many=True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
+
+    except MateriaCursoDocente.DoesNotExist:
+        return Response(
+            {"error": "No existe un curso con este id"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

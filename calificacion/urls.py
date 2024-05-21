@@ -15,4 +15,5 @@ urlpatterns = [
         "list-estudiante-cabecera-trimestre/<int:estudiante>/",
         views.ListEstudiantesCurso.as_view(),
     ),
+    path("curso-materia/<int:curso_materia>/", views.api_view),
 ]

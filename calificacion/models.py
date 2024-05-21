@@ -44,7 +44,7 @@ class CabeceraTrimestre(models.Model):
     materia_estudiante = models.ForeignKey(
         MateriaEstudiante,
         on_delete=models.CASCADE,
-        related_name="materia_estudiante",
+        related_name="estudiante_trimestre",
         verbose_name="Materia estudiante",
     )
     aporte_cualitativo = models.CharField(
@@ -84,7 +84,7 @@ class DetalleTrimestre(models.Model):
     cabecera_trimestre = models.ForeignKey(
         CabeceraTrimestre,
         on_delete=models.CASCADE,
-        related_name="cabecera_trimestre",
+        related_name="detalle_trimestre",
         verbose_name="Cabecera trimestre",
     )
 
@@ -114,7 +114,7 @@ class CabeceraActividad(models.Model):
     detalle_trimestre = models.ForeignKey(
         DetalleTrimestre,
         on_delete=models.CASCADE,
-        related_name="detalle_trimestre",
+        related_name="cabecera_actividad",
         verbose_name="Detalle trimestre",
     )
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario")
@@ -143,7 +143,7 @@ class DetalleActividad(models.Model):
     cabecera_actividad = models.ForeignKey(
         CabeceraActividad,
         on_delete=models.CASCADE,
-        related_name="cabecera_actividad",
+        related_name="detalle_actividad",
         verbose_name="Cabecera actividad",
     )
 
