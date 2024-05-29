@@ -1,8 +1,6 @@
 from calificacion.models import (
-    CabeceraActividad,
     CabeceraTrimestre,
-    DetalleActividad,
-    DetalleTrimestre,
+    Calificacion,
     MateriaEstudiante,
 )
 from calificacion.serializer import (
@@ -15,13 +13,12 @@ from curso.models import MateriaCursoDocente
 from curso.serializer import (
     MateriaEstudianteReadSerializer,
 )
-from persona.models import Estudiante
-from rest_framework import status, generics
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
-from rest_framework.decorators import api_view
+from rest_framework import status, generics  # type: ignore
+from rest_framework.permissions import IsAuthenticated  # type: ignore
+from rest_framework.decorators import action  # type: ignore
+from rest_framework.response import Response  # type: ignore
+from rest_framework.generics import ListAPIView  # type: ignore
+from rest_framework.decorators import api_view  # type: ignore
 
 
 # Create your views here.
@@ -88,6 +85,37 @@ class MateriaEstudianteAPI(generics.GenericAPIView):
             )
 
 
+class TrimestreEstudianteAPI(generics.GenericAPIView):
+    serializer_class = CabeceraTrimestreSerializer
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, method="POST")
+    def post(self, request):
+        serializer = CabeceraTrimestreSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, method="PUT")
+    def put(self, request):
+        id = request.data.get("id")
+        try:
+            curso = CabeceraTrimestre.objects.get(id=id)
+            serializer = CabeceraTrimestreSerializer(curso, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except MateriaEstudiante.DoesNotExist:
+            return Response(
+                {"error": "No existe un curso con este id."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
 class ListEstudiantesMateria(ListAPIView):
     serializer_class = MateriaEstudianteSerializer
     permission_classes = [IsAuthenticated]
@@ -138,7 +166,7 @@ def list_estudiantes_calificaciones(request, curso_materia):
     cabecera_trimestre = CabeceraTrimestre.objects.get(
         materia_estudiante__id=curso_materia
     )
-    detalle_trimestre = DetalleTrimestre.objects.filter(
+    detalle_trimestre = Calificacion.objects.filter(
         cabecera_trimestre=cabecera_trimestre
     )
 

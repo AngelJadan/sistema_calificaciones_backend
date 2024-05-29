@@ -5,6 +5,7 @@ from calificacion import views
 
 urlpatterns = [
     path("materia-estudiante/", views.MateriaEstudianteAPI.as_view()),
+    path("trimestre/", views.TrimestreEstudianteAPI.as_view()),
     path("list-curso-estudiante/<int:curso>/", views.ListEstudiantesCurso.as_view()),
     path(
         "list-materia-estudiante/<int:curso>/", views.ListEstudiantesMateria.as_view()
