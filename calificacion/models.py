@@ -44,7 +44,7 @@ class CabeceraTrimestre(models.Model):
     materia_estudiante = models.ForeignKey(
         MateriaEstudiante,
         on_delete=models.CASCADE,
-        related_name="materia_estudiante",
+        related_name="estudiante_trimestre",
         verbose_name="Materia estudiante",
     )
     aporte_cualitativo = models.CharField(
@@ -75,81 +75,35 @@ TIPO_APORTE = (
     ("2", "Actividades Disciplinares o indisciplinares grupales"),
 )
 
+ACTIVIDADES = (
+    ("1", "Leccion"),
+    ("2", "Prueba"),
+    ("3", "Tarea"),
+    ("4", "Proyecto"),
+    ("5", "Exposicion"),
+    ("6", "Taller"),
+)
 
-class DetalleTrimestre(models.Model):
+
+class Calificacion(models.Model):
+
     id = models.AutoField(primary_key=True, verbose_name="Id")
-    tipo_aporte = models.CharField(
-        max_length=1, choices=TIPO_APORTE, verbose_name="Tipo aporte"
+    aporte = models.CharField(choices=TIPO_APORTE, max_length=1, verbose_name="Aporte")
+    actividad = models.CharField(
+        choices=ACTIVIDADES, max_length=1, verbose_name="Actividad"
     )
-    cabecera_trimestre = models.ForeignKey(
+    item = models.IntegerField(verbose_name="Item")
+    calificacion = models.CharField(max_length=1, choices=CALIFICACION)
+    trimestre = models.ForeignKey(
         CabeceraTrimestre,
         on_delete=models.CASCADE,
-        related_name="cabecera_trimestre",
-        verbose_name="Cabecera trimestre",
-    )
-
-    def __str__(self):
-        return f"{self.id}"
-
-    class Meta:
-        verbose_name = "Detalle trimestre"
-        verbose_name_plural = "Detalle trimestres"
-
-
-TIPO_ACTIVIDAD = (
-    ("1", "LECCIONES ORALES/ESCRITAS"),
-    ("2", "PRUEBAS BASE ESTRUCTURADA"),
-    ("3", "TAREAS/EJERCICIOS"),
-    ("4", "PROYECTOS INTEGRADORES"),
-    ("5", "EXPOSICIONES/FOROS"),
-    ("6", "TALLERES"),
-)
-
-
-class CabeceraActividad(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Id")
-    nombre = models.CharField(
-        max_length=1, choices=TIPO_ACTIVIDAD, verbose_name="Nombre"
-    )
-    detalle_trimestre = models.ForeignKey(
-        DetalleTrimestre,
-        on_delete=models.CASCADE,
-        related_name="detalle_trimestre",
+        related_name="calificacion_detalle",
         verbose_name="Detalle trimestre",
     )
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario")
 
     def __str__(self):
         return f"{self.id}"
 
     class Meta:
-        verbose_name = "Cabecera actividad"
-        verbose_name_plural = "Cabecera actividades"
-
-    def validar_actividad_tipo_aporte(self):
-        pass
-
-
-NOMBRE_TAREA = (
-    ("1", "LECCION ESCRITA DE LAS PARTES ORACION"),
-    ("2", "CUALITATIVO"),
-)
-
-
-class DetalleActividad(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Id")
-    nombre = models.CharField(max_length=1, choices=NOMBRE_TAREA, verbose_name="Nombre")
-    calificacion = models.IntegerField(verbose_name="Calificacion")
-    cabecera_actividad = models.ForeignKey(
-        CabeceraActividad,
-        on_delete=models.CASCADE,
-        related_name="cabecera_actividad",
-        verbose_name="Cabecera actividad",
-    )
-
-    def __str__(self):
-        return f"{self.id}"
-
-    class Meta:
-        verbose_name = "Detalle actividad"
-        verbose_name_plural = "Detalle actividades"
+        verbose_name = "Calificacion"
+        verbose_name_plural = "Calificaciones"
