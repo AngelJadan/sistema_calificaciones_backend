@@ -8,7 +8,7 @@ from curso.models import (
     Paralelo,
     PeriodoLectivo,
 )
-from persona.serializer import EstudianteSerializer
+from persona.serializer import EstudianteSerializer, FuncionarioReadSerializer
 from rest_framework import serializers
 
 
@@ -91,6 +91,19 @@ class MateriaCursoDocenteReadSerializer(serializers.ModelSerializer):
             "materia",
             "docente",
             "materia_curso",
+        )
+        depth = 2
+
+
+class MateriaCursoDocenteSimpleReadSerializer(serializers.ModelSerializer):
+    class Meta:
+
+        model = MateriaCursoDocente
+        fields = (
+            "id",
+            "periodo_lectivo",
+            "curso",
+            "materia",
         )
         depth = 2
 

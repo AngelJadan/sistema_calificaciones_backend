@@ -17,4 +17,5 @@ urlpatterns = [
         views.ListEstudiantesCurso.as_view(),
     ),
     path("curso-materia/<int:curso_materia>/<int:trimestre>/", views.api_view),
+    path("docente-materia/<int:docente>/", views.api_view_docente_materia),
 ]
