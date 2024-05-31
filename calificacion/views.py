@@ -19,6 +19,7 @@ from rest_framework.decorators import action  # type: ignore
 from rest_framework.response import Response  # type: ignore
 from rest_framework.generics import ListAPIView  # type: ignore
 from rest_framework.decorators import api_view  # type: ignore
+from django.db.models import Prefetch
 
 
 # Create your views here.
@@ -245,9 +246,17 @@ class ListEstudianteCabeceraTrimestre(ListAPIView):
 
 
 @api_view(["GET"])
-def api_view(request, curso_materia):
+def api_view(request, curso_materia, trimestre):
     try:
-        materia_in_curso = MateriaEstudiante.objects.filter(materia_curso=curso_materia)
+        cabecera_trimestre = Prefetch(
+            "estudiante_trimestre",
+            queryset=CabeceraTrimestre.objects.filter(
+                numero_trimestre=trimestre,
+            ),
+        )
+        materia_in_curso = MateriaEstudiante.objects.filter(
+            materia_curso=curso_materia,
+        ).prefetch_related(cabecera_trimestre)
         serializers = MateriaEstudianteAllSerializer(materia_in_curso, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
