@@ -525,3 +525,24 @@ class MateriaEstudianteAPI(generics.GenericAPIView):
                 {"error": "No existe un periodo con este id"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class ListMateriaDocente(ListAPIView):
+    serializer_class = MateriaCursoDocenteReadSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return MateriaCursoDocente.objects.filter(
+                docente=self.kwargs["docente"]
+            ).order_by("id")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not self.request.user.is_authenticated:
+            return Response(
+                {"mensaje": "No tienes permisos para acceder"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serialzier = self.get_serializer(queryset, many=True)
+        return Response(serialzier.data, status=status.HTTP_200_OK)
