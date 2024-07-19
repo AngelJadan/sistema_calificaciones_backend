@@ -1,5 +1,6 @@
 from django.forms import ChoiceField
 from persona.models import Estudiante, Funcionario
+from persona.send_mail import send_mai
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import (
@@ -63,7 +64,11 @@ class FuncionarioSerializer(serializers.ModelSerializer):
             **validated_data,
             password=new_password,
         )
-        # Pendiente implementar enviar password al correo.
+        send_mai(
+            "Registro nuevo usuario",
+            new_funcionario.email,
+            f"Su clava es: {password}",
+        )
         return new_funcionario
 
     def update(self, Funcionario, validated_data):

@@ -9,8 +9,11 @@ from calificacion.serializer import (
     MateriaEstudianteAllSerializer,
     MateriaEstudianteSerializer,
 )
-from curso.models import MateriaCursoDocente
+from curso.models import MateriaCursoDocente, PeriodoLectivo
 from curso.serializer import (
+    MateriaCursoDocenteReadSerializer,
+    MateriaCursoDocenteSerializer,
+    MateriaCursoDocenteSimpleReadSerializer,
     MateriaEstudianteReadSerializer,
 )
 from rest_framework import status, generics  # type: ignore
@@ -19,6 +22,7 @@ from rest_framework.decorators import action  # type: ignore
 from rest_framework.response import Response  # type: ignore
 from rest_framework.generics import ListAPIView  # type: ignore
 from rest_framework.decorators import api_view  # type: ignore
+from django.db.models import Prefetch
 
 
 # Create your views here.
@@ -245,14 +249,37 @@ class ListEstudianteCabeceraTrimestre(ListAPIView):
 
 
 @api_view(["GET"])
-def api_view(request, curso_materia):
-    try:
-        materia_in_curso = MateriaEstudiante.objects.filter(materia_curso=curso_materia)
-        serializers = MateriaEstudianteAllSerializer(materia_in_curso, many=True)
-        return Response(serializers.data, status=status.HTTP_200_OK)
-
-    except MateriaCursoDocente.DoesNotExist:
-        return Response(
-            {"error": "No existe un curso con este id"},
-            status=status.HTTP_400_BAD_REQUEST,
+def api_view_docente_materia(request, docente):
+    if request.user.is_authenticated:
+        materia_docente = MateriaCursoDocente.objects.filter(docente=docente)
+        serializers = MateriaCursoDocenteSimpleReadSerializer(
+            materia_docente, many=True
         )
+        return Response(serializers.data, status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["GET"])
+def api_view(request, curso_materia, trimestre):
+    if request.user.is_authenticated:
+        try:
+            cabecera_trimestre = Prefetch(
+                "estudiante_trimestre",
+                queryset=CabeceraTrimestre.objects.filter(
+                    numero_trimestre=trimestre,
+                ),
+            )
+            materia_in_curso = MateriaEstudiante.objects.filter(
+                materia_curso=curso_materia,
+            ).prefetch_related(cabecera_trimestre)
+            serializers = MateriaEstudianteAllSerializer(materia_in_curso, many=True)
+            return Response(serializers.data, status=status.HTTP_200_OK)
+
+        except MateriaCursoDocente.DoesNotExist:
+            return Response(
+                {"error": "No existe un curso con este id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)

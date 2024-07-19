@@ -32,13 +32,20 @@ HOST = data_base_settings["HOST"]
 PORT = data_base_settings["PORT"]
 SECRETKEY = data_base_settings["SECRET_KEY"]
 
+
+EMAIL_HOST = data_base_settings["EMAIL_HOST"]
+EMAIL_HOST_USER = data_base_settings["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = data_base_settings["EMAIL_HOST_PASSWORD"]
+EMAIL_PORT = data_base_settings["EMAIL_PORT"]
+EMAIL_USE_TLS = data_base_settings["EMAIL_USE_TLS"]
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = SECRETKEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -159,4 +166,4 @@ MEDIA_URL = "/media/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-#DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

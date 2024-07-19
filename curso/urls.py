@@ -20,4 +20,5 @@ urlpatterns = [
         "list-materia-curso-docente-to-periodo/<int:periodo>/",
         views.ListMateriaCursoDocenteToPeriodo.as_view(),
     ),
+    path("list-cursos-docente/<int:docente>/", views.ListMateriaDocente.as_view()),
 ]

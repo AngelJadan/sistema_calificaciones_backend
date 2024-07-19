@@ -4,6 +4,7 @@ from curso.models import (
     Area,
     Curso,
     Materia,
+    MateriaCursoDocente,
     PeriodoLectivo,
     Paralelo,
 )
@@ -42,8 +43,13 @@ class PeriodoLectivoAdmin(admin.ModelAdmin):
     )
 
 
+class MateriaCursoDocenteAdmin(admin.ModelAdmin):
+    list_display = ("id", "periodo_lectivo", "materia", "docente")
+
+
 admin.site.register(Paralelo, ParaleloAdmin)
 admin.site.register(Curso, CursoAdmin)
+admin.site.register(MateriaCursoDocente, MateriaCursoDocenteAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(Materia, MateriaAdmin)
 admin.site.register(PeriodoLectivo, PeriodoLectivoAdmin)

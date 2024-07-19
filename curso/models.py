@@ -79,8 +79,8 @@ class PeriodoLectivo(models.Model):
         return f"{self.periodo}"
 
     class Meta:
-        verbose_name = "Materia curso docente"
-        verbose_name_plural = "Materias curso docente"
+        verbose_name = "Periodo"
+        verbose_name_plural = "Periodos"
 
 
 class MateriaCursoDocente(models.Model):
@@ -88,7 +88,7 @@ class MateriaCursoDocente(models.Model):
         primary_key=True,
     )
     periodo_lectivo = models.ForeignKey(
-        PeriodoLectivo, on_delete=models.CASCADE, verbose_name="Curso docente"
+        PeriodoLectivo, on_delete=models.CASCADE, verbose_name="Periodo lectivo"
     )
     curso = models.ForeignKey(
         Curso, related_name="curso", on_delete=models.CASCADE, verbose_name="Curso"
